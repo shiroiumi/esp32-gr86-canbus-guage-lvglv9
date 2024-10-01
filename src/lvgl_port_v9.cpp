@@ -63,14 +63,12 @@ void lv_port_disp_init(ESP_PanelLcd *lcd)
     lv_display_set_user_data(disp, lcd);
     lv_display_set_flush_cb(disp, flush_callback);
 
-    // /* Example 1
-    //  * One buffer for partial rendering*/
     ESP_LOGD(TAG, "Assign Buffer");
     LV_ATTRIBUTE_MEM_ALIGN
-    static uint8_t buf_2_1[ESP_PANEL_LCD_WIDTH * 20 * BYTE_PER_PIXEL];
+    static uint8_t buf_2_1[ESP_PANEL_LCD_WIDTH * 40 * BYTE_PER_PIXEL];
 
     LV_ATTRIBUTE_MEM_ALIGN
-    static uint8_t buf_2_2[ESP_PANEL_LCD_WIDTH * 20 * BYTE_PER_PIXEL];
+    static uint8_t buf_2_2[ESP_PANEL_LCD_WIDTH * 40 * BYTE_PER_PIXEL];
     lv_display_set_buffers(disp, buf_2_1, buf_2_2, sizeof(buf_2_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     lcd->attachRefreshFinishCallback(onRefreshFinishCallback, (void *)disp);

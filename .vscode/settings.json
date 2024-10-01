@@ -4,6 +4,17 @@
         "*.inc": "cpp",
         "*.tcc": "cpp",
         "cstddef": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "actions.h": "c",
+        "screens.h": "c",
+        "fonts.h": "c",
+        "images.h": "c",
+        "vars.h": "c",
+        "styles.h": "c",
+        "ui.h": "c",
+        "string.h": "c",
+        "compare": "c",
+        "sstream": "c",
+        "regex": "c"
     }
 }
