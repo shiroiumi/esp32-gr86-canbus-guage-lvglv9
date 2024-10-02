@@ -76,7 +76,6 @@ void lv_port_disp_init(ESP_PanelLcd *lcd)
 
 void flush_callback(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
 {
-    Serial.println("Flushing Display");
     ESP_PanelLcd *lcd = (ESP_PanelLcd *)lv_display_get_user_data(display);
     const int offsetx1 = area->x1;
     const int offsetx2 = area->x2;
