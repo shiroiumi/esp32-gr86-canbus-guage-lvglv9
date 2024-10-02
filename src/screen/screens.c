@@ -59,7 +59,7 @@ void create_screen_main()
                     objects.obj1 = obj;
                     lv_obj_set_pos(obj, 0, 0);
                     lv_obj_set_size(obj, 350, 350);
-                    lv_arc_set_range(obj, 0, 300);
+                    lv_arc_set_range(obj, 0, 800);
                     lv_arc_set_bg_start_angle(obj, 135);
                     lv_arc_set_bg_end_angle(obj, 45);
                     lv_obj_add_event_cb(obj, event_handler_cb_main_obj1, LV_EVENT_ALL, 0);
@@ -78,7 +78,7 @@ void create_screen_main()
                     lv_obj_set_pos(obj, 0, 0);
                     lv_obj_set_size(obj, 360, 360);
                     lv_scale_set_mode(obj, LV_SCALE_MODE_ROUND_INNER);
-                    lv_scale_set_range(obj, 0, 300);
+                    lv_scale_set_range(obj, 0, 8000);
                     lv_scale_set_total_tick_count(obj, 31);
                     lv_scale_set_major_tick_every(obj, 5);
                     lv_scale_set_label_show(obj, true);

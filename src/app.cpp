@@ -15,9 +15,15 @@ void can_task(void *params)
         twai_message_t rx_frame;
         if (twai_receive(&rx_frame, pdMS_TO_TICKS(200)) == ESP_OK)
         {
+            // Oil Temp
             if (rx_frame.identifier == 0x345)
             {
-                set_var_engine_temperature(rx_frame.data[3] - 40);
+                // set_var_engine_temperature(rx_frame.data[3] - 40);
+            }
+            // RPM 16 bit offset 14 length
+            if (rx_frame.identifier == 0x40)
+            {
+                set_var_engine_temperature(((rx_frame.data[3] << 8) | rx_frame.data[2]) & 0x3FFF);
             }
         }
     }
