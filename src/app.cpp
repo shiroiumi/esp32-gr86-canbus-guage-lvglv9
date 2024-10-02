@@ -3,8 +3,21 @@
 #include <ESP_Panel_Library.h>
 #include "screen/ui.h"
 #include "screen/vars.h"
+#include <CAN.h>
 
 ulong lastTick = 0;
+
+void on_can_packet_receive(int packetSize)
+{
+    long id = CAN.packetId();
+    int data[8];
+    int i = 0;
+    while (CAN.available())
+    {
+        data[i++] = CAN.read();
+    }
+    set_var_engine_temperature(data[3] - 40);
+}
 
 void setup()
 {
@@ -28,6 +41,15 @@ void setup()
     lvgl_port_lock(-1);
     ui_init();
     lvgl_port_unlock();
+    CAN.setPins(17, 16);
+    do
+    {
+        Serial.println("Waiting on CANBUS");
+        vTaskDelay(pdMS_TO_TICKS(2500));
+    } while (!CAN.begin(500E3));
+    CAN.filter(0x345);
+    CAN.onReceive(on_can_packet_receive);
+    Serial.println("Connected to CANBUS!");
     lastTick = millis();
 }
 
@@ -38,13 +60,5 @@ void loop()
     lvgl_port_unlock();
     lv_task_handler();
     lv_tick_inc(millis() - lastTick);
-    vTaskDelay(pdMS_TO_TICKS(10)); // Adjust the delay as necessar
-    if (get_var_engine_temperature() == 300)
-    {
-        set_var_engine_temperature(0);
-    }
-    else
-    {
-        set_var_engine_temperature(get_var_engine_temperature() + 1);
-    }
+    vTaskDelay(pdMS_TO_TICKS(10)); // Adjust the delay as necessary
 }
