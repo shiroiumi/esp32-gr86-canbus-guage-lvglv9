@@ -3,20 +3,76 @@
 #include <ESP_Panel_Library.h>
 #include "screen/ui.h"
 #include "screen/vars.h"
-#include <CAN.h>
+#include <driver/twai.h>
+#include <driver/gpio.h>
 
 ulong lastTick = 0;
 
-void on_can_packet_receive(int packetSize)
+void can_task(void *params)
 {
-    long id = CAN.packetId();
-    int data[8];
-    int i = 0;
-    while (CAN.available())
+    for (;;)
     {
-        data[i++] = CAN.read();
+        twai_message_t rx_frame;
+        if (twai_receive(&rx_frame, pdMS_TO_TICKS(200)) == ESP_OK)
+        {
+            if (rx_frame.identifier == 0x345)
+            {
+                set_var_engine_temperature(rx_frame.data[3] - 40);
+            }
+        }
     }
-    set_var_engine_temperature(data[3] - 40);
+}
+
+void setup_can_driver()
+{
+    twai_general_config_t general_config = {
+        .mode = TWAI_MODE_NORMAL,
+        .tx_io = (gpio_num_t)GPIO_NUM_16,
+        .rx_io = (gpio_num_t)GPIO_NUM_17,
+        .clkout_io = (gpio_num_t)TWAI_IO_UNUSED,
+        .bus_off_io = (gpio_num_t)TWAI_IO_UNUSED,
+        .tx_queue_len = 0,
+        .rx_queue_len = 65,
+        .alerts_enabled = TWAI_ALERT_ALL,
+        .clkout_divider = 0};
+
+    twai_timing_config_t timing_config = TWAI_TIMING_CONFIG_500KBITS();
+    twai_filter_config_t filter_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
+
+    esp_err_t error;
+    error = twai_driver_install(&general_config, &timing_config, &filter_config);
+
+    if (error == ESP_OK)
+    {
+        Serial.println("CAN DRIVER Installation OK!");
+    }
+    else
+    {
+        Serial.println("CAN DRIVER Installation Failed :(");
+        return;
+    }
+
+    error = twai_start();
+
+    if (error == ESP_OK)
+    {
+        Serial.println("CAN DRIVER STARTED!");
+    }
+    else
+    {
+        Serial.println("CAN DRIVER FAILED :(");
+        return;
+    }
+
+    TaskHandle_t can_task_handler;
+    xTaskCreatePinnedToCore(
+        can_task,          /* Function to implement the task */
+        "can_task",        /* Name of the task */
+        10000,             /* Stack size in words */
+        NULL,              /* Task input parameter */
+        0,                 /* Priority of the task */
+        &can_task_handler, /* Task handle. */
+        0);                /* Core where the task should run */
 }
 
 void setup()
@@ -41,14 +97,7 @@ void setup()
     lvgl_port_lock(-1);
     ui_init();
     lvgl_port_unlock();
-    CAN.setPins(17, 16);
-    do
-    {
-        Serial.println("Waiting on CANBUS");
-        vTaskDelay(pdMS_TO_TICKS(2500));
-    } while (!CAN.begin(500E3));
-    CAN.filter(0x345);
-    CAN.onReceive(on_can_packet_receive);
+    setup_can_driver();
     Serial.println("Connected to CANBUS!");
     lastTick = millis();
 }
