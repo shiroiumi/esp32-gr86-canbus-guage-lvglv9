@@ -15,6 +15,10 @@
         "string.h": "c",
         "compare": "c",
         "sstream": "c",
-        "regex": "c"
+        "regex": "c",
+        "typeinfo": "c",
+        "lvgl.h": "c",
+        "hardwareserial.h": "c",
+        "lvgl_private.h": "c"
     }
 }

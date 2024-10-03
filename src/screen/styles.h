@@ -8,12 +8,12 @@ extern "C"
 {
 #endif
 
-    // Style: Temp Guage
-    lv_style_t *get_style_temp_guage_INDICATOR_DEFAULT();
-    lv_style_t *get_style_temp_guage_MAIN_DEFAULT();
-    lv_style_t *get_style_temp_guage_ITEMS_DEFAULT();
-    void add_style_temp_guage(lv_obj_t *obj);
-    void remove_style_temp_guage(lv_obj_t *obj);
+    // Style: Guage
+    lv_style_t *get_style_guage_INDICATOR_DEFAULT();
+    lv_style_t *get_style_guage_MAIN_DEFAULT();
+    lv_style_t *get_style_guage_ITEMS_DEFAULT();
+    void add_style_guage(lv_obj_t *obj);
+    void remove_style_guage(lv_obj_t *obj);
 
 #ifdef __cplusplus
 }

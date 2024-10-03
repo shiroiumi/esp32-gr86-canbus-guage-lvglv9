@@ -11,8 +11,10 @@ extern "C"
     typedef struct _objects_t
     {
         lv_obj_t *main;
-        lv_obj_t *obj0;
-        lv_obj_t *obj1;
+        lv_obj_t *arc_value;
+        lv_obj_t *guage_scale;
+        lv_obj_t *sub_unit_text;
+        lv_obj_t *text_value;
     } objects_t;
 
     extern objects_t objects;

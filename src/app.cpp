@@ -5,8 +5,11 @@
 #include "screen/vars.h"
 #include <driver/twai.h>
 #include <driver/gpio.h>
+#include "control/display_control.h"
 
 ulong lastTick = 0;
+ulong lastTaskTime = 0;
+ulong taskInterval = 5000;
 
 void can_task(void *params)
 {
@@ -15,15 +18,22 @@ void can_task(void *params)
         twai_message_t rx_frame;
         if (twai_receive(&rx_frame, pdMS_TO_TICKS(200)) == ESP_OK)
         {
-            // Oil Temp
-            if (rx_frame.identifier == 0x345)
+            switch (get_guage_mode())
             {
-                // set_var_engine_temperature(rx_frame.data[3] - 40);
-            }
-            // RPM 16 bit offset 14 length
-            if (rx_frame.identifier == 0x40)
-            {
-                set_var_engine_temperature(((rx_frame.data[3] << 8) | rx_frame.data[2]) & 0x3FFF);
+            case RPM:
+
+                if (rx_frame.identifier == 0x40)
+                {
+                    // RPM 16 bit offset 14 length
+                    set_var_unit_value(((rx_frame.data[3] << 8) | rx_frame.data[2]) & 0x3FFF);
+                }
+                break;
+            case OIL_TEMP:
+                if (rx_frame.identifier == 0x345)
+                {
+                    set_var_unit_value(rx_frame.data[3] - 40);
+                }
+                break;
             }
         }
     }
@@ -81,6 +91,18 @@ void setup_can_driver()
         0);                /* Core where the task should run */
 }
 
+void runTask()
+{
+    if (get_guage_mode() == RPM)
+    {
+        set_guage_mode(OIL_TEMP);
+    }
+    else if (get_guage_mode() == OIL_TEMP)
+    {
+        set_guage_mode(RPM);
+    }
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -116,4 +138,12 @@ void loop()
     lv_task_handler();
     lv_tick_inc(millis() - lastTick);
     vTaskDelay(pdMS_TO_TICKS(10)); // Adjust the delay as necessary
+    if (millis() - lastTaskTime >= taskInterval)
+    {
+        // Execute the task
+        runTask();
+
+        // Update the last execution time
+        lastTaskTime = millis();
+    }
 }
