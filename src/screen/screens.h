@@ -15,6 +15,8 @@ extern "C"
         lv_obj_t *guage_scale;
         lv_obj_t *sub_unit_text;
         lv_obj_t *text_value;
+        lv_obj_t *chart;
+        lv_chart_series_t *series;
     } objects_t;
 
     extern objects_t objects;

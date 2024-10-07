@@ -9,6 +9,7 @@ int32_t guage_ticks = 91;
 int32_t guage_major_tick_every = 10;
 int32_t arc_min = 0;
 int32_t arc_max = 9000;
+bool mark_chart = true;
 
 int32_t get_var_unit_value()
 {
@@ -89,4 +90,14 @@ int32_t get_var_guage_major_ticks_every()
 void set_var_guage_major_tick_every(int32_t value)
 {
     guage_major_tick_every = value;
+}
+
+bool get_mark_chart()
+{
+    return mark_chart;
+}
+
+void set_mark_chart(bool b_mark)
+{
+    mark_chart = b_mark;
 }

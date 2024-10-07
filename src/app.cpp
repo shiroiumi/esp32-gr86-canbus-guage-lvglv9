@@ -9,7 +9,7 @@
 
 ulong lastTick = 0;
 ulong lastTaskTime = 0;
-ulong taskInterval = 5000;
+ulong taskInterval = 500;
 
 void can_task(void *params)
 {
@@ -93,14 +93,16 @@ void setup_can_driver()
 
 void runTask()
 {
-    if (get_guage_mode() == RPM)
-    {
-        set_guage_mode(OIL_TEMP);
-    }
-    else if (get_guage_mode() == OIL_TEMP)
-    {
-        set_guage_mode(RPM);
-    }
+    // set_var_unit_value(rand() % 9000);
+    set_mark_chart(true);
+    // if (get_guage_mode() == RPM)
+    // {
+    //     set_guage_mode(OIL_TEMP);
+    // }
+    // else if (get_guage_mode() == OIL_TEMP)
+    // {
+    //     set_guage_mode(RPM);
+    // }
 }
 
 void setup()
@@ -138,6 +140,9 @@ void loop()
     lv_task_handler();
     lv_tick_inc(millis() - lastTick);
     vTaskDelay(pdMS_TO_TICKS(10)); // Adjust the delay as necessary
+    if (get_guage_mode() == RPM)
+    {
+    }
     if (millis() - lastTaskTime >= taskInterval)
     {
         // Execute the task

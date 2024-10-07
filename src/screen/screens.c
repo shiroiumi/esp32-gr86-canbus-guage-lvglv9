@@ -108,14 +108,6 @@ void create_screen_main()
             {
                 lv_obj_t *parent_obj = obj;
                 {
-                    lv_obj_t *obj = lv_chart_create(parent_obj);
-                    lv_obj_set_pos(obj, 92, 251);
-                    lv_obj_set_size(obj, 145, 74);
-                    lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-                    lv_obj_set_style_radius(obj, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-                }
-                {
                     // sub_unit_text
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.sub_unit_text = obj;
@@ -184,6 +176,7 @@ void create_screen_main()
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffdadada), LV_PART_INDICATOR | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_font(obj, &ui_font_excluded_16, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
+                    // CUSTOM
                     // red section
                     static lv_style_t section_minor_tick_style;
                     static lv_style_t section_label_style;
@@ -216,6 +209,25 @@ void create_screen_main()
 
                     lv_obj_add_event(objects.guage_scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
                     lv_obj_add_flag(objects.guage_scale, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+                }
+                {
+                    // CUSTOM CHART
+                    lv_obj_t *obj = lv_chart_create(parent_obj);
+                    objects.chart = obj;
+                    lv_obj_set_pos(obj, 92, 251);
+                    lv_obj_set_size(obj, 145, 74);
+                    lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+                    lv_obj_set_style_radius(obj, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_chart_set_update_mode(obj, LV_CHART_UPDATE_MODE_SHIFT);
+                    lv_chart_set_range(obj, LV_CHART_AXIS_PRIMARY_Y, 0, 9000);
+                    lv_chart_set_point_count(obj, 60);
+                    lv_obj_set_style_opa(obj, 0, LV_PART_INDICATOR);
+                    // Chart series
+                    {
+                        lv_chart_series_t *series = lv_chart_add_series(obj, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
+                        objects.series = series;
+                    }
                 }
             }
         }
@@ -282,6 +294,7 @@ void tick_screen_main()
         }
     }
     {
+        // ARC
         int32_t new_val = get_var_unit_value();
         int32_t cur_val = lv_arc_get_value(objects.arc_value);
         if (new_val != cur_val)
@@ -322,6 +335,7 @@ void tick_screen_main()
             if (min < max)
             {
                 lv_scale_set_range(objects.guage_scale, min, max);
+                lv_chart_set_range(objects.chart, LV_CHART_AXIS_PRIMARY_Y, min, max);
             }
             lv_scale_set_label_show(objects.guage_scale, true);
             tick_value_change_obj = NULL;
@@ -338,6 +352,7 @@ void tick_screen_main()
             if (min < max)
             {
                 lv_scale_set_range(objects.guage_scale, min, max);
+                lv_chart_set_range(objects.chart, LV_CHART_AXIS_PRIMARY_Y, min, max);
             }
             lv_scale_set_label_show(objects.guage_scale, true);
             tick_value_change_obj = NULL;
@@ -363,6 +378,14 @@ void tick_screen_main()
             lv_scale_set_major_tick_every(objects.guage_scale, new_val);
             lv_scale_set_label_show(objects.guage_scale, true);
             tick_value_change_obj = NULL;
+        }
+    }
+    {
+        bool draw_mark = get_mark_chart();
+        if (draw_mark)
+        {
+            set_mark_chart(false);
+            lv_chart_set_next_value(objects.chart, objects.series, get_var_unit_value());
         }
     }
 }

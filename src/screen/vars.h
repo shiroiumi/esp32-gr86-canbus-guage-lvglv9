@@ -44,6 +44,8 @@ extern "C"
     void set_var_guage_ticks(int32_t value);
     int32_t get_var_guage_major_ticks_every();
     void set_var_guage_major_tick_every(int32_t value);
+    bool get_mark_chart();
+    void set_mark_chart(bool b_mark);
 
 #ifdef __cplusplus
 }
